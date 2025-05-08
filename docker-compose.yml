@@ -1,0 +1,51 @@
+version: '3.5'
+
+services:
+  xCMS-gatsby:
+    container_name: RESUMYA-GATSBY
+    working_dir: /home/gatsby-app
+    image: xcms-gatsby
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    logging:
+      options:
+        max-file: "5"
+        max-size: "10m"
+    networks:
+      frontend:
+      backend:
+        aliases:
+          - xcms-gatsby.local
+    volumes:
+      - gatsby_cache:/app/.cache  # persiste la cache
+      - gatsby_public:/app/public # persiste el output
+    env_file: .env
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.resumya_gatsby.rule=Host(`gatsby.devtr.es`)
+      - traefik.http.routers.resumya_gatsby.entrypoints=https
+      - traefik.docker.network=traefik_default
+      - traefik.http.routers.resumya_gatsby.tls=true
+      - traefik.http.routers.resumya_gatsby.tls.certresolver=default
+    ports:
+      # - "8000:8000"
+      - "4001:4001"
+    # command: ["./wait-for-strapi.sh", "gatsby", "develop", "--host", "0.0.0.0"]
+    environment:
+      - GATSBY_EXPERIMENTAL_PAGE_BUILD_ON_DATA_CHANGES=true
+      # - GATSBY_WEBPACK_PUBLICPATH: /
+      - STRAPI_URL=xCMS-strapi:1337
+
+networks:
+  frontend:
+    external:
+      name: traefik_frontend
+  backend:
+    external:
+      name: mysql_backend
+
+volumes:
+  gatsby_cache:
+  gatsby_public:
