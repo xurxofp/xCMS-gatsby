@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Link, graphql } from 'gatsby'
 import Layout from '../components/layout'
+import { GatsbyImage, getImage } from 'gatsby-plugin-image'
 
 const Category = ({ data }) => {
   const category = data.strapiResumyaCategory
@@ -9,8 +10,12 @@ const Category = ({ data }) => {
   return (
     <Layout pageTitle={category.name}>
       <ul className="postlist">
-        {posts.map((post) => {
+        {posts.map(post => {
           const authors = post.resumya_authors || []
+
+          // Prepara la imagen de portada
+          const coverImage = getImage(post.cover.localFile)
+
           return (
             <li key={post.id}>
               <Link className="postlink" to={`/${post.slug}`}>
@@ -18,26 +23,38 @@ const Category = ({ data }) => {
               </Link>
 
               <div className="image-wrap">
-                <img
-                  className="cover"
-                  src={post.cover.url}
-                  alt={`Cover for ${post.title}`}
-                />
-                {authors.map((author, idx) => (
-                  <img
-                    key={idx}
-                    className="avatar"
-                    src={author.avatar.url}
-                    alt={`Avatar for ${author.name}`}
+                {/* Portada optimizada */}
+                {coverImage && (
+                  <GatsbyImage
+                    className="cover"
+                    image={coverImage}
+                    alt={`Cover for ${post.title}`}
                   />
-                ))}
+                )}
+
+                {/* Avatares optimizados */}
+                {authors.map((author, idx) => {
+                  const avatarImage = getImage(author.avatar.localFile)
+                  return (
+                    avatarImage && (
+                      <GatsbyImage
+                        key={idx}
+                        className="avatar"
+                        image={avatarImage}
+                        alt={`Avatar for ${author.name}`}
+                      />
+                    )
+                  )
+                })}
               </div>
 
               <p className="date">{post.date}</p>
 
               <div className="postauthors">
                 {authors.map((author, idx) => (
-                  <p key={idx} className="name">Written by {author.name}</p>
+                  <p key={idx} className="name">
+                    Written by {author.name}
+                  </p>
                 ))}
               </div>
 
@@ -51,7 +68,7 @@ const Category = ({ data }) => {
 }
 
 export const query = graphql`
-  query ($id: String) {
+  query CategoryById($id: String!) {
     strapiResumyaCategory(id: { eq: $id }) {
       name
       resumya_posts {
@@ -60,13 +77,34 @@ export const query = graphql`
         title
         date(formatString: "MMMM D, YYYY")
         excerpt
+
+        # Portada: pedimos localFile.childImageSharp
         cover {
-          url
+          localFile {
+            childImageSharp {
+              gatsbyImageData(
+                width: 800
+                placeholder: BLURRED
+                formats: [AUTO, AVIF]
+              )
+            }
+          }
         }
+
+        # Autores: avatar como localFile.childImageSharp
         resumya_authors {
           name
           avatar {
-            url
+            localFile {
+              childImageSharp {
+                gatsbyImageData(
+                  width: 40
+                  height: 40
+                  placeholder: DOMINANT_COLOR
+                  formats: [AUTO, AVIF]
+                )
+              }
+            }
           }
         }
       }
@@ -75,7 +113,9 @@ export const query = graphql`
 `
 
 export const Head = ({ data }) => (
-  <title>{data.strapiResumyaCategory.name} - Strapi Gatsby Blog Site</title>
+  <title>
+    {data.strapiResumyaCategory.name} – Strapi Gatsby Blog Site
+  </title>
 )
 
 export default Category

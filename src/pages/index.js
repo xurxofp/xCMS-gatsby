@@ -1,9 +1,9 @@
 // src/pages/index.js
 import * as React from 'react'
 import { Link, graphql } from 'gatsby'
+import { GatsbyImage, getImage } from 'gatsby-plugin-image'
 import Layout from '../components/layout'
 import SEO from "../components/seo"
-
 
 const IndexPage = ({ data }) => {
   const posts = data.allStrapiResumyaPost.nodes || []
@@ -16,6 +16,8 @@ const IndexPage = ({ data }) => {
           const authors = node.resumya_authors || []
           const categories = node.resumya_categories || []
 
+          // extraemos los ImageData
+          const coverImage = getImage(node.cover.localFile)
           return (
             <li key={node.id}>
               <Link className="postlink" to={`/${node.slug}`}>
@@ -23,19 +25,27 @@ const IndexPage = ({ data }) => {
               </Link>
 
               <div className="image-wrap">
-                <img
-                  className="cover"
-                  src={node.cover.url}
-                  alt={`Cover for ${node.title}`}
-                />
-                {authors.map((author, idx) => (
-                  <img
-                    key={idx}
-                    className="avatar"
-                    src={author.avatar.url}
-                    alt={`Avatar for ${author.name}`}
+                {coverImage && (
+                  <GatsbyImage
+                    className="cover"
+                    image={coverImage}
+                    alt={`Cover for ${node.title}`}
                   />
-                ))}
+                )}
+
+                {authors.map((author, idx) => {
+                  const avatarImage = getImage(author.avatar.localFile)
+                  return (
+                    avatarImage && (
+                      <GatsbyImage
+                        key={idx}
+                        className="avatar"
+                        image={avatarImage}
+                        alt={`Avatar for ${author.name}`}
+                      />
+                    )
+                  )
+                })}
               </div>
 
               <p className="date">{node.date}</p>
@@ -73,12 +83,29 @@ export const query = graphql`
         date(formatString: "MMMM D, YYYY")
         excerpt
         cover {
-          url
+          localFile {
+            childImageSharp {
+              gatsbyImageData(
+                width: 800
+                placeholder: BLURRED
+                formats: [AUTO, AVIF]
+              )
+            }
+          }
         }
         resumya_authors {
           name
           avatar {
-            url
+            localFile {
+              childImageSharp {
+                gatsbyImageData(
+                  width: 40
+                  height: 40
+                  placeholder: DOMINANT_COLOR
+                  formats: [AUTO, AVIF]
+                )
+              }
+            }
           }
         }
         resumya_categories {

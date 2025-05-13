@@ -2,42 +2,48 @@
     "name": "gatsby-strapi-docker",
     "private": true,
     "dependencies": {
-      "gatsby": "^5.14.3",
-      "gatsby-plugin-image": "^3.12.0",
-      "gatsby-source-filesystem": "^5.12.0",
-      "gatsby-source-strapi": "^5.0.3",
-      "gatsby-transformer-remark": "^6.12.0",
-      "gatsby-plugin-react-helmet": "^6.14.0",
-      "react": "^18.2.0",
-      "react-dom": "^18.2.0",
-      "react-helmet": "^6.1.0",
-      "prop-types": "^15.7.2",
-      "express": "^5.1.0",
-      "p-queue": "^8.1.0"
+        "@strapi/blocks-react-renderer": "^1.0.2",
+        "express": "^5.1.0",
+        "gatsby": "^5.14.3",
+        "gatsby-plugin-image": "^3.12.0",
+        "gatsby-plugin-react-helmet": "^6.14.0",
+        "gatsby-plugin-remote-images": "^3.6.6",
+        "gatsby-plugin-sharp": "^5.14.0",
+        "gatsby-source-filesystem": "^5.14.0",
+        "gatsby-source-strapi": "^5.0.3",
+        "gatsby-transformer-remark": "^6.12.0",
+        "gatsby-transformer-sharp": "^5.14.0",
+        "html-react-parser": "^5.2.5",
+        "husky": "^9.1.7",
+        "p-queue": "^8.1.0",
+        "prop-types": "^15.7.2",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-helmet": "^6.1.0"
     },
     "devDependencies": {
-      "prettier": "^1.16.4"
+        "prettier": "^1.16.4"
     },
     "keywords": [
-      "gatsby"
+        "gatsby"
     ],
     "license": "MIT",
     "scripts": {
-      "build": "gatsby build",
-      "develop": "gatsby develop",
-      "format": "prettier --write src/**/*.{js,jsx}",
-      "start": "npm run develop",
-      "serve": "gatsby serve",
-      "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\"",
-      "docker:dev": "docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up",
-      "docker:prod": "docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up",
-      "docker:down": "docker-compose down"
+        "build": "gatsby build",
+        "develop": "gatsby develop",
+        "format": "prettier --write src/**/*.{js,jsx}",
+        "start": "npm run develop",
+        "serve": "gatsby serve",
+        "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\"",
+        "docker:dev": "docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up",
+        "docker:prod": "docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up",
+        "docker:down": "docker-compose down"
     },
     "repository": {
-      "type": "git",
-      "url": "https://github.com/gatsbyjs/gatsby-starter-default"
+        "type": "git",
+        "url": "https://github.com/gatsbyjs/gatsby-starter-default"
     },
     "bugs": {
-      "url": "https://github.com/gatsbyjs/gatsby/issues"
+        "url": "https://github.com/gatsbyjs/gatsby/issues"
     }
-  }
+}
