@@ -13,7 +13,10 @@ function runBuild() {
     console.log("Start rebuild");
     const build = spawn('npx', ['gatsby', 'build', '--log-pages'], {
       cwd: '/home/gatsby-app',
-      env: process.env
+      env: {
+        ...process.env,
+        GATSBY_EXPERIMENTAL_PAGE_BUILD_ON_DATA_CHANGES: 'true',
+      }
     });
     build.stdout.pipe(process.stdout);
     build.stderr.pipe(process.stderr);
@@ -33,7 +36,24 @@ function runBuild() {
         if (code2 !== 0) {
           return reject(new Error(`Deploy S3 falló: ${code2}`));
         }
-        resolve('Build incremental y deploy OK 🌐');
+    
+        const invalidation = spawn('aws', [
+          'cloudfront', 'create-invalidation',
+          '--distribution-id', process.env.AWS_CF_DISTRIBUTION_ID,
+          '--paths', '/*'
+        ], { cwd: '/home/gatsby-app', env: process.env });
+    
+        invalidation.stdout.pipe(process.stdout);
+        invalidation.stderr.pipe(process.stderr);
+    
+        invalidation.on('close', code3 => {
+          if (code3 !== 0) {
+            return reject(new Error(`Invalidación CloudFront falló: ${code3}`));
+          }
+          resolve('Build, deploy e invalidación OK 🌐');
+        });
+        invalidation.on('error', reject);
+    
       });
       deploy.on('error', reject);
     });
